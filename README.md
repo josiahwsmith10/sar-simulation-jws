@@ -2,14 +2,10 @@
 Copyright(C) 2020 The University of Texas at Dallas: Wireless Information Systems Laboratory (WISLAB)
 
 Developed by: Josiah W. Smith
-
-Advisor: Prof. Murat Torlak
-
-Department of Electrical and Computer Engineering
-
-Redistributions and use of source must retain the above copyright notice
-
-Redistributions in binary form must reproduce the above copyright notice
+Advisor: Prof. Murat Torlak <br/>
+Department of Electrical and Computer Engineering <br/>
+Redistributions and use of source must retain the above copyright notice <br/>
+Redistributions in binary form must reproduce the above copyright notice <br/>
 
 Simulation Scripts for SAR and CSAR Scenarios
 - TI mmWave EVM radars simulated, namely XWR1443
