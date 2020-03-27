@@ -15,3 +15,7 @@ Simulation Scripts for SAR and CSAR Scenarios
 - TI mmWave EVM radars simulated, namely XWR1443
 - Linear and Rectilinear SAR scanning patterns
 - Circular and Cylindrical SAR scanning patterns
+
+Josiah W. Smith 
+E-mail:     jws160130@utdallas.edu or josiah.wayland.smith10@gmail.com
+LinkedIn:   https://www.linkedin.com/in/josiah-smith-151b04158/
