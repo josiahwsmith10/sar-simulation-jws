@@ -1,7 +1,6 @@
 # sar-simulation-jws
-Copyright(C) 2020 The University of Texas at Dallas: Wireless Information Systems Laboratory (WISLAB)
-
-Developed by: Josiah W. Smith
+Copyright(C) 2020 The University of Texas at Dallas: Wireless Information Systems Laboratory (WISLAB) <br/>
+Developed by: Josiah W. Smith <br/>
 Advisor: Prof. Murat Torlak <br/>
 Department of Electrical and Computer Engineering <br/>
 Redistributions and use of source must retain the above copyright notice <br/>
