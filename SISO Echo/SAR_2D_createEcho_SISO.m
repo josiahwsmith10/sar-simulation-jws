@@ -60,7 +60,7 @@ if ~isempty(gcp('nocreate')) % if parallel pool is open
             for izP = 1:p.zLim
                 if pxyz(ixP,iyP,izP) > 1e-8
                     R = sqrt((xM_m - p.xT(ixP)).^2 + (yM_m - p.yT(iyP)).^2 + (p.zT(izP)).^2);
-                    syxk = syxk + pxyz(ixP,iyP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R);
+                    syxk = syxk + pxyz(ixP,iyP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R - 1j*pi*fParams.K*(2*R/c).^2));
                 end
             end
         end
@@ -72,7 +72,7 @@ else
             for izP = 1:p.zLim
                 if pxyz(ixP,iyP,izP) > 1e-8
                     R = sqrt((xM_m - p.xT(ixP)).^2 + (yM_m - p.yT(iyP)).^2 + (p.zT(izP)).^2);
-                    syxk = syxk + pxyz(ixP,iyP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R);
+                    syxk = syxk + pxyz(ixP,iyP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R - 1j*pi*fParams.K*(2*R/c).^2));
                 end
             end
         end

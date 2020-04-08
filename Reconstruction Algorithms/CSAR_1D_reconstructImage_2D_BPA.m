@@ -46,7 +46,10 @@ clear c f f0
 
 %% Declare theta Synthetic Aperture Vector
 %-------------------------------------------------------------------------%
-theta_rad = (0:iParams.tStepM_deg:((iParams.nAngMeasurement-1)*iParams.tStepM_deg))*pi/180;
+% theta_rad = (0:iParams.tStepM_deg:((iParams.nAngMeasurement-1)*iParams.tStepM_deg))*pi/180;
+% theta_rad = reshape(theta_rad,[],1);
+
+theta_rad = ( (-iParams.nAngMeasurement/2):( (iParams.nAngMeasurement/2) - 1) )*iParams.tStepM_deg*pi/180;
 theta_rad = reshape(theta_rad,[],1);
 
 %% Do Image Reconstruction
@@ -57,16 +60,32 @@ csarImage = zeros(length(xRangeT_m),length(zRangeT_m));
 lengthz = length(zRangeT_m);
 R0_m = iParams.R0_mm*1e-3;
 
-parfor ixP = 1:length(xRangeT_m)
-    for izP = 1:lengthz
-        R = sqrt( (R0_m*cos(theta_rad) - xRangeT_m(ixP)).^2 + (R0_m*sin(theta_rad) - zRangeT_m(izP)).^2 );
-        if iParams.isAmplitudeFactor
-            % Slower
-            %             pxz(ixP,izP) = trapz(k(:),trapz(thetaM(:),csarData.*R.^2.*exp(-1j*R*2*k),1),2);
-            % Faster!
-            csarImage(ixP,izP) = sum(csarData.*R.^(2).*exp(-1j*R*2*k),'all');
-        else
-            csarImage(ixP,izP) = sum(csarData.*exp(-1j*R*2*k),'all');
+if ~isempty(gcp('nocreate'))
+    parfor ixP = 1:length(xRangeT_m)
+        for izP = 1:lengthz
+            R = sqrt( (R0_m*cos(theta_rad) - xRangeT_m(ixP)).^2 + (R0_m*sin(theta_rad) - zRangeT_m(izP)).^2 );
+            if iParams.isAmplitudeFactor
+                % Slower
+                %             pxz(ixP,izP) = trapz(k(:),trapz(thetaM(:),csarData.*R.^2.*exp(-1j*R*2*k),1),2);
+                % Faster!
+                csarImage(ixP,izP) = sum(csarData.*R.^(2).*exp(-1j*R*2*k),'all');
+            else
+                csarImage(ixP,izP) = sum(csarData.*exp(-1j*R*2*k),'all');
+            end
+        end
+    end
+else
+    for ixP = 1:length(xRangeT_m)
+        for izP = 1:lengthz
+            R = sqrt( (R0_m*cos(theta_rad) - xRangeT_m(ixP)).^2 + (R0_m*sin(theta_rad) - zRangeT_m(izP)).^2 );
+            if iParams.isAmplitudeFactor
+                % Slower
+                %             pxz(ixP,izP) = trapz(k(:),trapz(thetaM(:),csarData.*R.^2.*exp(-1j*R*2*k),1),2);
+                % Faster!
+                csarImage(ixP,izP) = sum(csarData.*R.^(2).*exp(-1j*R*2*k),'all');
+            else
+                csarImage(ixP,izP) = sum(csarData.*exp(-1j*R*2*k),'all');
+            end
         end
     end
 end

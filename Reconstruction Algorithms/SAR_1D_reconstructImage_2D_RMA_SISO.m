@@ -98,11 +98,11 @@ kU = 1/2 * sqrt(kX.^2 + kZU.^2);
 %-------------------------------------------------------------------------%
 sarImageFFT = zeros(size(kU));
 if ~isempty(gcp('nocreate'))
-    parfor ii = 1:size(kU,1) % Replace with parfor to increase speed
+    parfor ii = 1:size(kU,1)
         sarImageFFT(ii,:) = interp1(k(:),sarDataFFT(ii,:),kU(ii,:),iParams.Stolt,0);
     end
 else
-    for ii = 1:size(kU,1) % Replace with parfor to increase speed
+    for ii = 1:size(kU,1)
         sarImageFFT(ii,:) = interp1(k(:),sarDataFFT(ii,:),kU(ii,:),iParams.Stolt,0);
     end
 end

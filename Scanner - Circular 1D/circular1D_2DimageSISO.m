@@ -13,36 +13,42 @@ addpath(genpath("../"))
 %% 2. Load iParams, fParams, and p
 %-------------------------------------------------------------------------%
 load fParamsAll; load iParamsAll; load pAll
-fParams = fParamsAll.v0;                    % Frequency Parameters
+fParams = fParamsAll.v3;                    % Frequency Parameters
 iParams = iParamsAll.SISO_CSAR;             % Image and Scanning Parameters (360deg of rotation)
 p = pAll.CSAR_Grid3D;                       % Reflectivity p(x,y,z) parameters
 clear fParamsAll iParamsAll pAll
 
 %% 3. Get the SISO-CSAR Echo Signal s(theta,k): csarData
 %-------------------------------------------------------------------------%
-% p.pxyz(end/2,end/2,end/2) = 1;
-p.pxyz(end/4,end/2,end/4) = 1;
 iParams.showP = true;
-
+% iParams.nAngMeasurement = 128;
+% iParams.tStepM_deg = 360/iParams.nAngMeasurement;
 csarData = CSAR_1D_createEcho_SISO(iParams,fParams,p);
 
 %% 4. 2D Image Reconstruction by Back Projection Algorithm (BPA)
 %-------------------------------------------------------------------------%
 iParams.isAmplitudeFactor = true;
-csarImage2D_BPA = CSAR_1D_reconstructImage_2D_BPA(s_theta_k,iParams,fParams,p);
+csarImage2D_BPA = CSAR_1D_reconstructImage_2D_BPA(csarData,iParams,fParams,p);
 
 %% 5. 2D Image Reconstruction Polar Formatting Algorithm (PFA)
 %-------------------------------------------------------------------------%
-iParams.nFFT = 512;
-iParams.xzSizeT_m = 0.4;
-iParams.xU = 4;
-iParams.zU = 4;
+iParams.nFFT = 512;         % Size of FFT (Before Upsampling)
+iParams.xzSizeT_m = 0.4;    % Expected Size of Target
+iParams.xU = 4;             % x-axis Upsample Factor
+iParams.zU = 4;             % z-axis Upsample Factor
 csarImage2D_PFA = CSAR_1D_reconstructImage_2D_PFA(csarData,iParams,fParams);
 
 %% 6. 2D Image Reconstruction Segmented Polar Formatting Algorithm (PFA)
 %-------------------------------------------------------------------------%
-iParams.nFFT = 512;
-iParams.xzSizeT_m = 0.4;
-iParams.xU = 4;
-iParams.zU = 4;
-csarImage2D_SegmentedPFA = CSAR_1D_reconstructImage_2D_SegmentedPFA(csarData,iParams,fParams);
+iParams.nFFT = 1024;        % Size of FFT (Before Upsampling)
+iParams.xzSizeT_m = 0.4;    % Expected Size of Target
+iParams.xU = 4;             % x-axis Upsample Factor
+iParams.zU = 4;             % z-axis Upsample Factor
+[csarImage2D_SegmentedPFA,x,z] = CSAR_1D_reconstructImage_2D_SegmentedPFA(csarData,iParams,fParams);
+
+%% Plot Range Profile
+nFFTBins = 4096;
+csarRangeData = fft(csarData,nFFTBins,2);
+ra = generateRangeAxis(fParams,nFFTBins);
+figure;mesh(ra,(1:512)/512*360,abs(csarRangeData))
+view(0,0)

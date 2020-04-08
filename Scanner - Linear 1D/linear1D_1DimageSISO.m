@@ -21,7 +21,6 @@ clear fParamsAll iParamsAll pAll
 %% 3. Get the SISO Echo Signal sarData = s(x,k)
 %-------------------------------------------------------------------------%
 % Scanning is performed in the horizontal domain only using SISO
-% iParams.nUsefulHorMeasurement = 200;
 sarDataX = SAR_1D_createEcho_SISO(iParams,fParams,p);
 
 %% 4. Construct the 1D Image from the Data at iParams.z0_mm

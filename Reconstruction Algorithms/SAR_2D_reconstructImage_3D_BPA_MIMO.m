@@ -45,7 +45,7 @@ clear c f f0
 
 %% Declare x Synthetic Aperture Vector
 %-------------------------------------------------------------------------%
-xM = (0:iParams.nUsefulHorMeasurement-1)*iParams.xStepM*1e-3;
+xM = (0:iParams.nUsefulHorMeasurement-1)*iParams.xStepM_mm*1e-3;
 if mod(iParams.nUsefulHorMeasurement,2) == 0
     xM = xM - xM(end/2);
 else
@@ -55,7 +55,7 @@ xM = reshape(xM,1,[]);
 
 %% Declare Spatial y Vector
 %-------------------------------------------------------------------------%
-yM = (0:iParams.nVerMeasurement-1)*iParams.yStepM*1e-3;
+yM = (0:iParams.nVerMeasurement-1)*iParams.yStepM_mm*1e-3;
 if mod(iParams.nVerMeasurement,2) == 0
     yM = yM - yM(end/2);
 else

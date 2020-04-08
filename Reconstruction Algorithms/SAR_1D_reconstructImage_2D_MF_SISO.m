@@ -29,7 +29,6 @@ function sarImage = SAR_1D_reconstructImage_2D_MF_SISO(sarDataX,iParams,fParams,
 %   f0                  :   Chirp start frequency (Hz)
 %
 % p: struct with fields
-%   pxyz                :   Reflectivity function p(x,y,z)
 %   xT                  :   x-axis of target domain
 %   zT                  :   z-axis of target domain
 
@@ -108,7 +107,7 @@ xlim([zRangeT_m(1) zRangeT_m(end)])
 ylim([xRangeT_m(1) xRangeT_m(end)])
 xlabel("z (m)")
 ylabel("x (m)")
-title(iParams.scanName + " SAR 2D Image using BPA")
+title(iParams.scanName + " SAR 2D Image using Matched Filter-BPA")
 
 sarImageLog = mag2db(abs(sarImage));
 sarImageLog = sarImageLog - max(sarImageLog(:));
@@ -120,4 +119,4 @@ zlabel("dB")
 xlim([zRangeT_m(1) zRangeT_m(end)])
 ylim([xRangeT_m(1) xRangeT_m(end)])
 zlim([-100 0])
-title(iParams.scanName + " SAR 2D Log Image using BPA")
+title(iParams.scanName + " SAR 2D Log Image using Matched Filter-BPA")

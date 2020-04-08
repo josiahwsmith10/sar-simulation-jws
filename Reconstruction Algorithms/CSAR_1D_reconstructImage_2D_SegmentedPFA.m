@@ -35,7 +35,7 @@ function [csarImage,xRangeT_m,zRangeT_m] =  CSAR_1D_reconstructImage_2D_Segmente
 %% Declare Optional Parameters
 %-------------------------------------------------------------------------%
 if ~isfield(iParams,'scanName')
-    iParams.scanName = 'ISAR-PFA';
+    iParams.scanName = 'CSAR-PFA';
 end
 if ~isfield(iParams,'PFA')
     iParams.PFA = 'linear';
@@ -65,6 +65,9 @@ clear f f0
 theta_rad = (0:iParams.tStepM_deg:((iParams.nAngMeasurement-1)*iParams.tStepM_deg))*pi/180;
 theta_rad = reshape(theta_rad,[],1);
 
+% theta_rad = ( (-iParams.nAngMeasurement/2):( (iParams.nAngMeasurement/2) - 1) )*iParams.tStepM_deg*pi/180;
+% theta_rad = reshape(theta_rad,[],1);
+
 %% Upsample csarData using interp2
 %-------------------------------------------------------------------------%
 kUpsample = reshape(linspace(min(k),max(k),iParams.nFFT*iParams.zU),1,[]);
@@ -87,8 +90,11 @@ for iSeg = 1:nSeg
     
     %% Declare kX and kZ
     %---------------------------------------------------------------------%
-    kX = 2*k.*cos(theta_radUpsample(idxtheta));
-    kZ = 2*k.*sin(theta_radUpsample(idxtheta));
+%     kX = 2*k.*cos(theta_radUpsample(idxtheta));
+%     kZ = 2*k.*sin(theta_radUpsample(idxtheta));
+    
+    kX = 2*kUpsample.*cos(theta_radUpsample);
+    kZ = 2*kUpsample.*sin(theta_radUpsample);
     
     kXmax = max(max(kX));
     kZmax = max(max(kZ));
@@ -102,8 +108,8 @@ for iSeg = 1:nSeg
     
     %% Compute Azimuth Filtered Data: p(theta,k) = IFT[ s(Theta,k) * H*(Theta,k) ]
     %---------------------------------------------------------------------%
-    isarDataUpsampledFFT = fft(csarDataUpsampled(idxtheta2,:),[],1);
-    azimuthFilteredData = ifft(isarDataUpsampledFFT .* conj(azimuthFilterFFT));
+    csarDataUpsampledFFT = fft(csarDataUpsampled(idxtheta2,:),[],1);
+    azimuthFilteredData = ifft(csarDataUpsampledFFT .* conj(azimuthFilterFFT));
     
     %% Declare kXU and kZU
     %---------------------------------------------------------------------%
@@ -118,13 +124,13 @@ for iSeg = 1:nSeg
     
     %% Interpolate Azimuth Filtered Data to CSAR Image FFT: p(kX,kZ)
     %---------------------------------------------------------------------%
-    isarImageFFT = interp2(kUpsample,theta_radUpsample(idxtheta),azimuthFilteredData,kU,theta_radU,iParams.PFA,0);
+    csarImageFFT = interp2(kUpsample,theta_radUpsample(idxtheta),azimuthFilteredData,kU,theta_radU,iParams.PFA,0);
     
     %% Recover CSAR Image: p(x,z)
     %---------------------------------------------------------------------%
-    csarImage(:,:,iSeg) = ifftshift(ifft2(isarImageFFT));
+    csarImage(:,:,iSeg) = ifftshift(ifft2(csarImageFFT));
     csarImage(:,:,iSeg) = rot90(csarImage(:,:,iSeg),iSeg-1);
-    %     figure; mesh(abs(isarImage(:,:,iSeg)));
+%     figure; mesh(abs(csarImage(:,:,iSeg)));
 end
 
 %% Coherently Sum Created Images

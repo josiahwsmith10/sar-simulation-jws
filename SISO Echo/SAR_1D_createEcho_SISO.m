@@ -46,7 +46,7 @@ if ~isempty(gcp('nocreate')) % if parallel pool is open
         for izP = 1:p.zLim
             if pxz(ixP,izP) > 1e-8
                 R = sqrt((p.zT(izP)).^2 + (xM_m - p.xT(ixP)).^2);
-                sarData = sarData + pxz(ixP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R);
+                sarData = sarData + pxz(ixP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R - 1j*pi*fParams.K*(2*R/c).^2);
             end
         end
     end
@@ -55,7 +55,7 @@ else                     % but if the parallel pool is not open
         for izP = 1:p.zLim
             if pxz(ixP,izP) > 1e-8
                 R = sqrt((p.zT(izP)).^2 + (xM_m - p.xT(ixP)).^2);
-                sarData = sarData + pxz(ixP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R);
+                sarData = sarData + pxz(ixP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R - 1j*pi*fParams.K*(2*R/c).^2);
             end
         end
     end

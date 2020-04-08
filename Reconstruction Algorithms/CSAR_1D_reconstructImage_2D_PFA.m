@@ -21,7 +21,8 @@ function [csarImage,xRangeT_m,zRangeT_m] = CSAR_1D_reconstructImage_2D_PFA(csarD
 %   R0_mm               :   Scanning radius
 %   xzSizeT_m           :   Expected size of the target in the xz domain in m
 %   scanName            :   Name of the scan
-%   PFA                 :   Interpolation method for PFA
+%   PFA                 :   Interpolation method for PFA (default: 'linear')
+%   af                  :   Azimuth Filter Type (default: 1)
 %   nFFT                :   Number of FFT bins to use (before upsampling)
 %   xU                  :   Upsampling factor in x-axis
 %   zU                  :   Upsampling factor in z-axis
@@ -39,7 +40,7 @@ if ~isfield(iParams,'scanName')
     iParams.scanName = 'CSAR-PFA';
 end
 if ~isfield(iParams,'PFA')
-    iParams.PFA = 'nearest';
+    iParams.PFA = 'linear';
 end
 if ~isfield(iParams,'xU')
     iParams.xU = 4;
@@ -49,6 +50,12 @@ if ~isfield(iParams,'zU')
 end
 if ~isfield(iParams,'xzSizeT_m')
     iParams.xzSizeT_m = 0.4;
+end
+if ~isfield(iParams,'displayResult')
+    iParams.displayResult = true;
+end
+if ~isfield(iParams,'af')
+    iParams.af = 1;
 end
 
 %% Declare Wavenumber Vector
@@ -63,7 +70,10 @@ clear f f0
 
 %% Declare theta_rad Synthetic Aperture Vector
 %-------------------------------------------------------------------------%
-theta_rad = (0:iParams.tStepM_deg:((iParams.nAngMeasurement-1)*iParams.tStepM_deg))*pi/180;
+% theta_rad = (0:iParams.tStepM_deg:((iParams.nAngMeasurement-1)*iParams.tStepM_deg))*pi/180;
+% theta_rad = reshape(theta_rad,[],1);
+
+theta_rad = ( (-iParams.nAngMeasurement/2):( (iParams.nAngMeasurement/2) - 1) )*iParams.tStepM_deg*pi/180;
 theta_rad = reshape(theta_rad,[],1);
 
 %% Declare kX and kZ
@@ -95,7 +105,6 @@ kU = (1/2)*sqrt(kXU.^2 + kZU.^2);
 kUpsample = reshape(linspace(min(k),max(k),length(kZU)),1,[]);
 theta_radUpsample = reshape(linspace(min(theta_rad),max(theta_rad),length(kXU)),[],1);
 
-% csarDataUpsampled = interp2(k,theta_rad,csarData,kUpsample,theta_radUpsample,iParams.PFA,0);
 csarDataUpsampled = interpn(theta_rad,k,csarData,theta_radUpsample,kUpsample,iParams.PFA,0);
 
 %% Compute Azimuth Filter: h(theta,k)
@@ -106,11 +115,26 @@ azimuthFilterFFT = fft(azimuthFilter,[],1);
 %% Compute Azimuth Filtered Data: p(theta,k) = IFT[ s(Theta,k) * H*(Theta,k) ]
 %-------------------------------------------------------------------------%
 csarDataUpsampledFFT = fft(csarDataUpsampled,[],1);
-azimuthFiltered = ifft(csarDataUpsampledFFT .* conj(azimuthFilterFFT));
+
+if iParams.af == 1
+    % Multiply by Conjugate of Azimuth Filter FFT in Fourier Theta Domain
+    azimuthFiltered = conj(ifft(csarDataUpsampledFFT .* conj(azimuthFilterFFT),[],1));
+elseif iParams.af == 2
+    % Multipy by Only Phase of Azimuth Filter FFT
+    azimuthFiltered = conj(ifft(csarDataUpsampledFFT .* exp(-1j*angle(azimuthFilterFFT)),[],1));
+elseif iParams.af == 3
+    % Hankel Function Asymptotic Approximation
+    dtheta = mean(diff(theta_rad));
+    Theta = reshape((0:(length(theta_radUpsample)-1))/(2*dtheta*length(theta_radUpsample)),[],1);
+    azimuthFilterFFT = exp(-1j*sqrt(4* (kUpsample).^2 * (iParams.R0_mm*1e-3)^2 - Theta.^2));
+    azimuthFiltered = ifft(csarDataUpsampledFFT .* azimuthFilterFFT,[],1);
+elseif iParams.af == 4
+    % Division in Fourier Theta Domain to Perform Deconvolution
+    azimuthFiltered = conj(ifft(csarDataUpsampledFFT ./ azimuthFilterFFT,[],1));
+end
 
 %% Interpolate Azimuth Filtered Data to CSAR Image FFT: p(kX,kZ)
 %-------------------------------------------------------------------------%
-% csarImageFFT = interp2(kUpsample,theta_radUpsample,azimuthFiltered,kU,theta_radU,iParams.PFA,0);
 csarImageFFT = interpn(theta_radUpsample,kUpsample,azimuthFiltered,theta_radU,kU,iParams.PFA,0);
 
 %% Recover CSAR Image: p(x,z)
@@ -132,24 +156,26 @@ end
 
 %% Display the Result
 %-------------------------------------------------------------------------%
-figure('OuterPosition',[350 150 670*2 712]);
-subplot(121)
-mesh(zRangeT_m,xRangeT_m*1e3,abs(csarImage),'FaceColor','interp','LineStyle','none')
-% view(2)
-xlim([zRangeT_m(1) zRangeT_m(end)])
-ylim([xRangeT_m(1)*1e3 xRangeT_m(end)*1e3])
-xlabel("z (m)")
-ylabel("x (mm)")
-title(iParams.scanName + " CSAR 2D Image using MATLAB " + iParams.PFA + " Interpolation")
-
-csarImageLog = mag2db(abs(csarImage));
-csarImageLog = csarImageLog - max(csarImageLog(:));
-subplot(122)
-mesh(zRangeT_m,xRangeT_m*1e3,csarImageLog,'FaceColor','interp','LineStyle','none')
-xlabel("z (m)")
-ylabel("x (mm)")
-zlabel("dB")
-xlim([zRangeT_m(1) zRangeT_m(end)])
-ylim([xRangeT_m(1)*1e3 xRangeT_m(end)*1e3])
-zlim([-100 0])
-title(iParams.scanName + " CSAR 2D Log Image using MATLAB " + iParams.PFA + " Interpolation")
+if iParams.displayResult
+    figure('OuterPosition',[350 150 670*2 712]);
+    subplot(121)
+    mesh(zRangeT_m,xRangeT_m,abs(csarImage),'FaceColor','interp','LineStyle','none')
+    view(2)
+    xlim([zRangeT_m(1) zRangeT_m(end)])
+    ylim([xRangeT_m(1) xRangeT_m(end)])
+    xlabel("z (m)")
+    ylabel("x (m)")
+    title(iParams.scanName + " CSAR 2D Image using MATLAB " + iParams.PFA + " Interpolation")
+    
+    csarImageLog = mag2db(abs(csarImage));
+    csarImageLog = csarImageLog - max(csarImageLog(:));
+    subplot(122)
+    mesh(zRangeT_m,xRangeT_m,csarImageLog,'FaceColor','interp','LineStyle','none')
+    xlabel("z (m)")
+    ylabel("x (m)")
+    zlabel("dB")
+    xlim([zRangeT_m(1) zRangeT_m(end)])
+    ylim([xRangeT_m(1) xRangeT_m(end)])
+    zlim([-100 0])
+    title(iParams.scanName + " CSAR 2D Log Image using MATLAB " + iParams.PFA + " Interpolation")
+end

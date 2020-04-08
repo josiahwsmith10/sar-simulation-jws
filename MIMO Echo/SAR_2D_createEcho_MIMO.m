@@ -59,29 +59,59 @@ if iParams.mex
 else
     pxyz = p.pxyz;
     sizeSarData = size(sarData);
-    parfor ixP = 1:p.xLim   % or use regular for loops
-        for iyP = 1:p.yLim
-            for izP = 1:p.zLim
-                if pxyz(ixP,iyP,izP) > 1e-8
-                    stot = zeros(sizeSarData);
-                    for dely = (-(iParams.nVerMeasurement-1)/2:1:(iParams.nVerMeasurement-1)/2) * 2*iParams.lambda_mm * 1e-3
-                        yr = yr_orig_m.' + dely - yv_orig_m(end/2);
-                        yt = yt_orig_m.' + dely - yv_orig_m(end/2);
+    if ~isempty(gcp('nocreate'))
+        parfor ixP = 1:p.xLim   % or use regular for loops
+            for iyP = 1:p.yLim
+                for izP = 1:p.zLim
+                    if pxyz(ixP,iyP,izP) > 1e-8
+                        stot = zeros(sizeSarData);
+                        for dely = (-(iParams.nVerMeasurement-1)/2:1:(iParams.nVerMeasurement-1)/2) * 2*iParams.lambda_mm * 1e-3
+                            yr = yr_orig_m.' + dely - yv_orig_m(end/2);
+                            yt = yt_orig_m.' + dely - yv_orig_m(end/2);
+                            
+                            Rr = sqrt( (p.xT(ixP) - xM_m).^2 + (p.yT(iyP) - yr).^2 + (p.zT(izP))^2);
+                            Rt = sqrt( (p.xT(ixP) - xM_m).^2 + (p.yT(iyP) - yt).^2 + (p.zT(izP))^2);
+                            
+                            s = zeros(iParams.nRx*iParams.nTx,length(xM_m),length(k));
+                            s(1:iParams.nRx*iParams.nTx/2,:,:) = pxyz(ixP,iyP,izP) .* (Rt(1,:).*Rr).^(-1) .* exp(1j*k.*(Rt(1,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(1,:)+Rr).^2);
+                            s(iParams.nRx*iParams.nTx/2+1:end,:,:) = pxyz(ixP,iyP,izP) .* (Rt(2,:).*Rr).^(-1) .* exp(1j*k.*(Rt(2,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(2,:)+Rr).^2);
+                            
+                            idxStart = round((dely/(2*iParams.lambda_mm*1e-3) + (iParams.nVerMeasurement-1)/2)*iParams.nTx*iParams.nRx + 1);
+                            idxEnd = round((dely/(2*iParams.lambda_mm*1e-3) + (iParams.nVerMeasurement-1)/2 + 1)*iParams.nTx*iParams.nRx);
+                            
+                            stot(idxStart:idxEnd,:,:) = s;
+                        end
                         
-                        Rr = sqrt( (p.xT(ixP) - xM_m).^2 + (p.yT(iyP) - yr).^2 + (p.zT(izP))^2);
-                        Rt = sqrt( (p.xT(ixP) - xM_m).^2 + (p.yT(iyP) - yt).^2 + (p.zT(izP))^2);
-                        
-                        s = zeros(iParams.nRx*iParams.nTx,length(xM_m),length(k));
-                        s(1:iParams.nRx*iParams.nTx/2,:,:) = pxyz(ixP,iyP,izP) .* (Rt(1,:).*Rr).^(-1) .* exp(1j*k.*(Rt(1,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(1,:).*Rr).^2);
-                        s(iParams.nRx*iParams.nTx/2+1:end,:,:) = pxyz(ixP,iyP,izP) .* (Rt(2,:).*Rr).^(-1) .* exp(1j*k.*(Rt(2,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(2,:).*Rr).^2);
-                        
-                        idxStart = round((dely/(2*iParams.lambda_mm*1e-3) + (iParams.nVerMeasurement-1)/2)*iParams.nTx*iParams.nRx + 1);
-                        idxEnd = round((dely/(2*iParams.lambda_mm*1e-3) + (iParams.nVerMeasurement-1)/2 + 1)*iParams.nTx*iParams.nRx);
-                        
-                        stot(idxStart:idxEnd,:,:) = s;
+                        sarData = sarData + stot;
                     end
-                    
-                    sarData = sarData + stot;
+                end
+            end
+        end
+    else
+        for ixP = 1:p.xLim   % or use regular for loops
+            for iyP = 1:p.yLim
+                for izP = 1:p.zLim
+                    if pxyz(ixP,iyP,izP) > 1e-8
+                        stot = zeros(sizeSarData);
+                        for dely = (-(iParams.nVerMeasurement-1)/2:1:(iParams.nVerMeasurement-1)/2) * 2*iParams.lambda_mm * 1e-3
+                            yr = yr_orig_m.' + dely - yv_orig_m(end/2);
+                            yt = yt_orig_m.' + dely - yv_orig_m(end/2);
+                            
+                            Rr = sqrt( (p.xT(ixP) - xM_m).^2 + (p.yT(iyP) - yr).^2 + (p.zT(izP))^2);
+                            Rt = sqrt( (p.xT(ixP) - xM_m).^2 + (p.yT(iyP) - yt).^2 + (p.zT(izP))^2);
+                            
+                            s = zeros(iParams.nRx*iParams.nTx,length(xM_m),length(k));
+                            s(1:iParams.nRx*iParams.nTx/2,:,:) = pxyz(ixP,iyP,izP) .* (Rt(1,:).*Rr).^(-1) .* exp(1j*k.*(Rt(1,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(1,:)+Rr).^2);
+                            s(iParams.nRx*iParams.nTx/2+1:end,:,:) = pxyz(ixP,iyP,izP) .* (Rt(2,:).*Rr).^(-1) .* exp(1j*k.*(Rt(2,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(2,:)+Rr).^2);
+                            
+                            idxStart = round((dely/(2*iParams.lambda_mm*1e-3) + (iParams.nVerMeasurement-1)/2)*iParams.nTx*iParams.nRx + 1);
+                            idxEnd = round((dely/(2*iParams.lambda_mm*1e-3) + (iParams.nVerMeasurement-1)/2 + 1)*iParams.nTx*iParams.nRx);
+                            
+                            stot(idxStart:idxEnd,:,:) = s;
+                        end
+                        
+                        sarData = sarData + stot;
+                    end
                 end
             end
         end

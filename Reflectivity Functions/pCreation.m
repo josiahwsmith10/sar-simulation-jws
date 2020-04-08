@@ -8,139 +8,153 @@
 
 %% Load pAll
 %-------------------------------------------------------------------------%
-load("../../Algorithms/pAll")
+load("pAll")
 
 %% Save new pAll
 %-------------------------------------------------------------------------%
-save("../../Algorithms/pAll","pAll")
+save("pAll","pAll")
 
 %% Create 2D Airplane Reflectivity Function
 %-------------------------------------------------------------------------%
-p.pxy = imread("airplane.png");
-p.pxy = imresize(p.pxy,[32,32]);
-p.pxy = double(mean(p.pxy,3));
-p.pxy = p.pxy - min(p.pxy(:));
+clear p
+p.xLim = 256;
+p.zLim = 256;
 
-[p.xLim,p.yLim] = size(p.pxy);
+p.pxz = imread("airplane.png");
+p.pxz = imresize(p.pxz,[p.xLim,p.zLim]);
+p.pxz = double(mean(p.pxz,3));
+p.pxz = p.pxz - min(p.pxz(:));
 
-p.pxy(p.pxy>1) = 1;
-p.pxy(p.pxy<1) = 0;
+p.pxz(p.pxz>1) = 1;
+p.pxz(p.pxz<1) = 0;
 
-p.xT = linspace(-0.1,0.1,p.xLim);
+p.xMax = 0.15;
+p.zMax = 0.5;
 
-p.yT = linspace(-0.1,0.1,p.yLim);
+p.xT = linspace(-p.xMax+2*p.xMax/p.xLim,p.xMax,p.xLim);
+p.zT = linspace(2*p.zMax/p.zLim,2*p.zMax,p.zLim);
 
 % Look at the Reflectivity Function
 figure
-imagesc(squeeze(p.yT),squeeze(p.xT),squeeze(p.pxy))
+imagesc(squeeze(p.zT),squeeze(p.xT),squeeze(p.pxz))
 title("Reflectivity Function")
 xlabel("x")
-ylabel("y")
+ylabel("z")
+pAll.Airplane = p
 
 %% Create 3D Airplane Reflectivity Function
 %-------------------------------------------------------------------------%
-p.pxy = imread("airplane.png");
-p.pxy = imresize(p.pxy,[32,32]);
-p.pxy = double(mean(p.pxy,3));
-p.pxy = imrotate(p.pxy,180);
-p.pxy = p.pxy - min(p.pxy(:));
+clear p
 
-[p.xLim,p.yLim] = size(p.pxy);
+p.xLim = 256;
+p.yLim = 256;
+p.zLim = 256;
+
+p.xMax = 0.15;
+p.yMax = 0.25;
+p.zMax = 0.5;
+
+p.xT = linspace(-p.xMax+2*p.xMax/p.xLim,p.xMax,p.xLim);
+p.yT = linspace(-p.yMax+2*p.yMax/p.yLim,p.yMax,p.yLim);
+p.zT = linspace(2*p.zMax/p.zLim,2*p.zMax,p.zLim);
+
+p.pxz = imread("airplane.png");
+p.pxz = imresize(p.pxz,[p.xLim,p.zLim]);
+p.pxz = double(mean(p.pxz,3));
+p.pxz = imrotate(p.pxz,180);
+p.pxz = p.pxz - min(p.pxz(:));
 
 p.thr = 1;
 
-p.pxy(p.pxy>p.thr) = 1;
-p.pxy(p.pxy<p.thr) = 0;
+p.pxz(p.pxz>p.thr) = 1;
+p.pxz(p.pxz<p.thr) = 0;
 
-p.xT = linspace(-0.1,0.1,p.xLim);
-p.yT = linspace(-0.1,0.1,p.yLim);
-
-p.zLim = 100;
-p.zT = linspace(0,1,p.zLim);
-
-%% Put the Airplane different places in the scene
+% Put the Airplane different places in the scene
 %-------------------------------------------------------------------------%
-p.pxyz = zeros([size(p.pxy) p.zLim]);
-iParams.z0 = 500;
-[~,iy0] = min(abs(p.zT - iParams.z0*1e-3));
-p.pxyz(:,:,iy0) = p.pxy;
+p.pxyz = zeros([p.xLim,p.yLim,p.zLim]);
+p.pxyz(:,end/4,:) = p.pxz;
 
-y1 = 750;
-[~,iy1] = min(abs(p.zT - y1*1e-3));
-p.pxyz(:,:,iy1) = imrotate(p.pxy,90);
+p.pxyz(:,end/2,:) = imrotate(p.pxz,90);
 
-y2 = 250;
-[~,iy2] = min(abs(p.zT - y2*1e-3));
-p.pxyz(:,:,iy2) = imrotate(p.pxy,-90);
+p.pxyz(:,3*end/4,:) = imrotate(p.pxz,-90);
 
-clear iz0 z1 iz1 z2 iz2
 pAll.Airplanes = p
 
 %% Create 1D/2D PSF Reflectivity Function
 %-------------------------------------------------------------------------%
-p.xLim = 225;
-p.yLim = 225;
+clear p
+p.xLim = 256;
+p.yLim = 256;
+p.zLim = 256;
 
-p.pxy = zeros(p.xLim,p.yLim);
-p.pxy(round(end/2),round(end/2)) = 1;
-% p.pxy(round(end/2),round(end/2)+5) = 1;
+p.xMax = 0.15;
+p.yMax = 0.25;
+p.zMax = 0.5;
 
-p.xT = linspace(-0.1,0.1,p.xLim);
-p.yT = linspace(-0.1,0.1,p.yLim);
+p.xT = linspace(-p.xMax+2*p.xMax/p.xLim,p.xMax,p.xLim);
+p.yT = linspace(-p.yMax+2*p.yMax/p.yLim,p.yMax,p.yLim);
+p.zT = linspace(2*p.zMax/p.zLim,2*p.zMax,p.zLim);
+
+p.pxz = zeros(p.xLim,p.yLim);
+p.pxz(round(end/2),round(end/2)) = 1;
 
 p.py = zeros(1,p.yLim);
-p.py( (end+1)/2 ) = 1;
+p.py(end/2) = 1;
 
 figure
 plot(p.yT,p.py)
 
 % Look at the PSF
 figure
-mesh(squeeze(p.yT),squeeze(p.xT),squeeze(p.pxy))
+mesh(squeeze(p.zT),squeeze(p.xT),squeeze(p.pxz))
 title("Reflectivity Function")
 xlabel("x")
-ylabel("y")
-p
+ylabel("z")
+pAll.PSF = p
+
 %% Create 3D PSF
 %-------------------------------------------------------------------------%
-p.xLim = 225;
-p.yLim = 225;
+clear p
+p.xLim = 256;
+p.yLim = 256;
+p.zLim = 256;
 
-p.pxy = zeros(p.xLim,p.yLim);
-p.pxy(round(end/2),round(end/2)) = 1;
-% p.pxy(round(end/2),round(end/2)+5) = 1;
+p.xMax = 0.15;
+p.yMax = 0.25;
+p.zMax = 0.5;
 
-p.xT = linspace(-0.1,0.1,p.xLim);
-p.yT = linspace(-0.1,0.1,p.yLim);
+p.xT = linspace(-p.xMax+2*p.xMax/p.xLim,p.xMax,p.xLim);
+p.yT = linspace(-p.yMax+2*p.yMax/p.yLim,p.yMax,p.yLim);
+p.zT = linspace(2*p.zMax/p.zLim,2*p.zMax,p.zLim);
 
-p.zLim = 45;
-p.zT = linspace(0,2*iParams.z0*1e-3,p.zLim);
+p.pxz = zeros(p.xLim,p.yLim);
+p.pxz(round(end/2),round(end/2)) = 1;
 
-p.pxyz = cat(3, zeros( [size(p.pxy) (p.zLim-1)/2] ), p.pxy , zeros( [size(p.pxy) (p.zLim-1)/2 ]));
+p.pxyz = cat(3, zeros( [size(p.pxz) (p.zLim)/2] ), p.pxz , zeros( [size(p.pxz) (p.zLim)/2 ]));
 
 pAll.PSF = p
 
 %% Create 3D Grid of Point Reflectors
 %-------------------------------------------------------------------------%
-addpath("../../Algorithms");
-load fParamsAll; load iParamsAll;
-fParams = fParamsAll.Muhammet;
-iParams = iParamsAll.MIMO;
-clear fParamsAll iParamsAll
+clear p
 
-p.zLim = 256;
 p.xLim = 256;
 p.yLim = 256;
-p.zT = linspace(1/p.zLim,1,p.zLim);
-p.xT = linspace(-1+2/p.xLim,1,p.xLim);
-p.yT = linspace(-1+2/p.yLim,1,p.yLim);
-iParams.z0 = 500; % mm
+p.zLim = 256;
+
+p.xMax = 0.15;
+p.yMax = 0.25;
+p.zMax = 0.5;
+
+p.xT = linspace(-p.xMax+2*p.xMax/p.xLim,p.xMax,p.xLim);
+p.yT = linspace(-p.yMax+2*p.yMax/p.yLim,p.yMax,p.yLim);
+p.zT = linspace(2*p.zMax/p.zLim,2*p.zMax,p.zLim);
 
 p.pxyz = zeros([length(p.xT),length(p.yT),length(p.zT)]);
 p.pxyz((end/2-16):16:(end/2+16),(end/2-16):16:(end/2+16),(end/2-32):32:(end/2+32)) = 1;
 
 pAll.Grid3D = p
-% volumeViewer(permute(p.pxyz,[2 1 3]))
+volumeViewer(permute(p.pxyz,[2 1 3]))
 
 %% Look at the non-zero z-ranges
 %-------------------------------------------------------------------------%

@@ -31,8 +31,8 @@ clear f f0
 
 %% Declare theta Synthetic Aperture Vector
 %-------------------------------------------------------------------------%
-thetaM_rad = (0:iParams.tStepM_deg:((iParams.nAngMeasurement-1)*iParams.tStepM_deg))*pi/180;
-thetaM_rad = reshape(thetaM_rad,[],1);
+theta_rad = ( (-iParams.nAngMeasurement/2):( (iParams.nAngMeasurement/2) - 1) )*iParams.tStepM_deg*pi/180;
+theta_rad = reshape(theta_rad,[],1);
 
 %% Look at the Reflectivity of the Target Scene
 %-------------------------------------------------------------------------%
@@ -61,8 +61,8 @@ if ~isempty(gcp('nocreate')) % if parallel pool is open
     parfor ixP = 1:p.xLim
         for izP = 1:p.zLim
             if pxz(ixP,izP) > 1e-8
-                R = sqrt( (R0*cos(thetaM_rad) - p.xT(ixP)).^2 + (R0*sin(thetaM_rad) - p.zT(izP)).^2 );
-                isarData = isarData + pxz(ixP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R);
+                R = sqrt( (R0*cos(theta_rad) - p.xT(ixP)).^2 + (R0*sin(theta_rad) - p.zT(izP)).^2 );
+                isarData = isarData + pxz(ixP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R - 1j*pi*fParams.K*(2*R/c).^2);
             end
         end
     end
@@ -70,8 +70,8 @@ else
     for ixP = 1:p.xLim
         for izP = 1:p.zLim
             if pxz(ixP,izP) > 1e-8
-                R = sqrt( (R0*cos(thetaM_rad) - p.xT(ixP)).^2 + (R0*sin(thetaM_rad) - p.zT(izP)).^2 );
-                isarData = isarData + pxz(ixP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R);
+                R = sqrt( (R0*cos(theta_rad) - p.xT(ixP)).^2 + (R0*sin(theta_rad) - p.zT(izP)).^2 );
+                isarData = isarData + pxz(ixP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R - 1j*pi*fParams.K*(2*R/c).^2);
             end
         end
     end

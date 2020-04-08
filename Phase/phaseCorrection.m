@@ -80,7 +80,7 @@ elseif iParams.CSAR
     %---------------------------------------------------------------------%
     phaseCorrectionFactor = exp(-1j* k .* dz_r.^2 / (4*iParams.R0_mm*1e-3));
     
-    phaseCorrectionFactor = repmat(phaseCorrectionFactor,[1,1,iParams.nVerMeasurement]);
+    phaseCorrectionFactor = single(repmat(phaseCorrectionFactor,[1,1,iParams.nVerMeasurement]));
     
     sarDataOut = sarDataIn .* phaseCorrectionFactor;
 end

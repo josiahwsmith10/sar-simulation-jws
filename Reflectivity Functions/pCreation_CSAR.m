@@ -21,14 +21,20 @@ p.pxz = imresize(p.pxz,[256,256]);
 p.pxz = double(mean(p.pxz,3));
 p.pxz = p.pxz - min(p.pxz(:));
 
-[p.xLim,p.zLim] = size(p.pxz);
-
 p.pxz(p.pxz>1) = 1;
 p.pxz(p.pxz<1) = 0;
 
-p.xT = linspace(-0.15,0.15,p.xLim);
+p.xLim = 256;
+p.yLim = 256;
+p.zLim = 256;
 
-p.zT = linspace(-0.15,0.15,p.zLim);
+p.xMax = 0.15;
+p.yMax = 0.25;
+p.zMax = 0.15;
+
+p.xT = linspace(-p.xMax+2*p.xMax/p.xLim,p.xMax,p.xLim);
+p.yT = linspace(-p.yMax+2*p.yMax/p.yLim,p.yMax,p.yLim);
+p.zT = linspace(-p.zMax+2*p.zMax/p.zLim,p.zMax,p.zLim);
 
 % Look at the Reflectivity Function
 figure
@@ -49,15 +55,17 @@ p.pxz = p.pxz - min(p.pxz(:));
 
 p.thr = 1;
 
-p.pxz(p.pxz>p.thr) = 1;
-p.pxz(p.pxz<p.thr) = 0;
-
-p.xT = linspace(-0.15,0.15,p.xLim);
-
-p.zT = linspace(-0.15,0.15,p.zLim);
-
+p.xLim = 256;
 p.yLim = 256;
-p.yT = linspace(0,1,p.yLim);
+p.zLim = 256;
+
+p.xMax = 0.15;
+p.yMax = 0.25;
+p.zMax = 0.15;
+
+p.xT = linspace(-p.xMax+2*p.xMax/p.xLim,p.xMax,p.xLim);
+p.yT = linspace(-p.yMax+2*p.yMax/p.yLim,p.yMax,p.yLim);
+p.zT = linspace(-p.zMax+2*p.zMax/p.zLim,p.zMax,p.zLim);
 
 %% Put the Airplane different places in the scene CSAR
 %-------------------------------------------------------------------------%
@@ -83,9 +91,14 @@ clear p
 p.xLim = 256;
 p.yLim = 256;
 p.zLim = 256;
-p.xT = linspace(-0.15,0.15,p.xLim);
-p.yT = linspace(-0.15,0.15,p.yLim);
-p.zT = linspace(-0.15,0.15,p.zLim);
+
+p.xMax = 0.15;
+p.yMax = 0.25;
+p.zMax = 0.15;
+
+p.xT = linspace(-p.xMax+2*p.xMax/p.xLim,p.xMax,p.xLim);
+p.yT = linspace(-p.yMax+2*p.yMax/p.yLim,p.yMax,p.yLim);
+p.zT = linspace(-p.zMax+2*p.zMax/p.zLim,p.zMax,p.zLim);
 
 p.pxyz = zeros(p.xLim,p.yLim,p.zLim);
 p.pxyz(end/2,end/2,end/2) = 1;
@@ -98,9 +111,14 @@ clear p
 p.xLim = 256;
 p.yLim = 256;
 p.zLim = 256;
-p.xT = linspace(-0.15,0.15,p.xLim);
-p.yT = linspace(-0.15,0.15,p.yLim);
-p.zT = linspace(-0.15,0.15,p.zLim);
+
+p.xMax = 0.15;
+p.yMax = 0.25;
+p.zMax = 0.15;
+
+p.xT = linspace(-p.xMax+2*p.xMax/p.xLim,p.xMax,p.xLim);
+p.yT = linspace(-p.yMax+2*p.yMax/p.yLim,p.yMax,p.yLim);
+p.zT = linspace(-p.zMax+2*p.zMax/p.zLim,p.zMax,p.zLim);
 
 p.pxyz = zeros(p.xLim,p.yLim,p.zLim);
 p.pxyz(end/2 - 32,end/2,end/2) = 1;
@@ -113,9 +131,14 @@ clear p
 p.xLim = 256;
 p.yLim = 256;
 p.zLim = 256;
-p.xT = linspace(-0.15,0.15,p.xLim);
-p.yT = linspace(-0.15,0.15,p.yLim);
-p.zT = linspace(-0.15,0.15,p.zLim);
+
+p.xMax = 0.15;
+p.yMax = 0.25;
+p.zMax = 0.15;
+
+p.xT = linspace(-p.xMax+2*p.xMax/p.xLim,p.xMax,p.xLim);
+p.yT = linspace(-p.yMax+2*p.yMax/p.yLim,p.yMax,p.yLim);
+p.zT = linspace(-p.zMax+2*p.zMax/p.zLim,p.zMax,p.zLim);
 
 p.pxyz = zeros(p.xLim,p.yLim,p.zLim);
 p.pxyz((end/2-32):32:(end/2+32),(end/2-16):16:(end/2+16),(end/2-32):32:(end/2+32)) = 1;
@@ -127,8 +150,12 @@ pAll.CSAR_Grid3D = p
 clear p
 p.xLim = 256;
 p.zLim = 256;
-p.xT = linspace(-0.15,0.15,p.xLim);
-p.zT = linspace(-0.15,0.15,p.zLim);
+
+p.xMax = 0.15;
+p.zMax = 0.15;
+
+p.xT = linspace(-p.xMax+2*p.xMax/p.xLim,p.xMax,p.xLim);
+p.zT = linspace(-p.zMax+2*p.zMax/p.zLim,p.zMax,p.zLim);
 
 p.pxz = imread("letterR.png");
 p.pxz = imresize(p.pxz,[20,20]);
@@ -160,8 +187,12 @@ pAll.CSAR_R = p
 clear p
 p.xLim = 256;
 p.zLim = 256;
-p.xT = linspace(-0.15,0.15,p.xLim);
-p.zT = linspace(-0.15,0.15,p.zLim);
+
+p.xMax = 0.15;
+p.zMax = 0.15;
+
+p.xT = linspace(-p.xMax+2*p.xMax/p.xLim,p.xMax,p.xLim);
+p.zT = linspace(-p.zMax+2*p.zMax/p.zLim,p.zMax,p.zLim);
 
 p.pxz = imread("letterJ.jpg");
 p.pxz = imresize(p.pxz,[20,20]);

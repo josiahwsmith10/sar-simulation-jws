@@ -9,7 +9,7 @@
 function sarImage = SAR_2D_reconstructImage_3D_RMA_MIMO(sarData,iParams,fParams)
 % Reconstructs a 3D image from SAR echo data using the range migration
 % algorithm (RMA). Expects a 2D rectilinear scan across the x-axis with a
-% SISO transceiver and the y-axis with a MIMO transceiver
+% MIMO transceiver and the y-axis with a MIMO transceiver
 
 %% Input Arguments
 %-------------------------------------------------------------------------%

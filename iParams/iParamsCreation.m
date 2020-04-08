@@ -29,6 +29,8 @@ iParams.lambda_mm = 299792458/(79e9)*1e3; % mm
 iParams.yStepM_mm = 1; % mm
 iParams.z0_mm = 500; % mm
 iParams.scanName = "SISO-SAR";
+iParams.CSAR = false;
+iParams.MIMO = false;
 
 iParamsAll.SISO_SAR = iParams
 
@@ -47,6 +49,7 @@ iParams.yStepM_mm = 1; % mm
 iParams.R0_mm = 500; % mm
 iParams.scanName = "SISO-CSAR";
 iParams.CSAR = true;
+iParams.MIMO = false;
 
 iParamsAll.SISO_CSAR = iParams
 
@@ -65,6 +68,8 @@ iParams.lambda_mm = 299792458/(79e9)*1e3; % mm
 iParams.yStepM_mm = iParams.lambda_mm/4; % mm
 iParams.z0_mm = 500; % mm
 iParams.scanName = "MIMO-SAR";
+iParams.CSAR = false;
+iParams.MIMO = true;
 
 iParamsAll.MIMO_SAR = iParams
 
@@ -74,14 +79,15 @@ clear iParams
 iParams.nTx = 2;
 iParams.nRx = 4;
 iParams.nAngMeasurement = 512;
-iParams.nVerMeasurement = 32;
+iParams.nVerMeasurement = 64;
 iParams.nFFT = 512;
-iParams.xyzSizeT_m = -1; % mm
+iParams.xyzSizeT_m = 0.4; % mm
 iParams.tStepM_deg = 360/iParams.nAngMeasurement; % deg
 iParams.lambda_mm = 299792458/(79e9)*1e3; % mm
 iParams.yStepM_mm = iParams.lambda_mm/4; % mm
-iParams.R0 = 500; % mm
+iParams.R0_mm = 500; % mm
 iParams.scanName = "MIMO-CSAR";
 iParams.CSAR = true;
+iParams.MIMO = true;
 
 iParamsAll.MIMO_CSAR = iParams

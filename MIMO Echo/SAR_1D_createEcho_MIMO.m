@@ -49,8 +49,8 @@ if ~isempty(gcp('nocreate')) % if parallel pool is open
                     Rt = sqrt( (p.yT(iyP) - yt).^2 + (p.zT(izP))^2);
                     
                     s = zeros(iParams.nRx*iParams.nTx,length(k));
-                    s(1:iParams.nRx*iParams.nTx/2,:) = pyz(iyP,izP) .* (Rt(1,:).*Rr).^(-1) .* exp(1j*k.*(Rt(1,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(1,:).*Rr).^2);
-                    s(iParams.nRx*iParams.nTx/2+1:end,:) = pyz(iyP,izP) .* (Rt(2,:).*Rr).^(-1) .* exp(1j*k.*(Rt(2,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(2,:).*Rr).^2);
+                    s(1:iParams.nRx*iParams.nTx/2,:) = pyz(iyP,izP) .* (Rt(1,:).*Rr).^(-1) .* exp(1j*k.*(Rt(1,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(1,:)+Rr).^2);
+                    s(iParams.nRx*iParams.nTx/2+1:end,:) = pyz(iyP,izP) .* (Rt(2,:).*Rr).^(-1) .* exp(1j*k.*(Rt(2,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(2,:)+Rr).^2);
                     
                     idxStart = round((dely/(2*iParams.lambda_mm*1e-3) + (iParams.nVerMeasurement-1)/2)*iParams.nTx*iParams.nRx + 1);
                     idxEnd = round((dely/(2*iParams.lambda_mm*1e-3) + (iParams.nVerMeasurement-1)/2 + 1)*iParams.nTx*iParams.nRx);
@@ -76,8 +76,8 @@ else                     % but if the parallel pool is not open
                     Rt = sqrt( (p.yT(iyP) - yt).^2 + (p.zT(izP))^2);
                     
                     s = zeros(iParams.nRx*iParams.nTx,length(k));
-                    s(1:iParams.nRx*iParams.nTx/2,:) = pyz(iyP,izP) .* (Rt(1,:).*Rr).^(-1) .* exp(1j*k.*(Rt(1,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(1,:).*Rr).^2);
-                    s(iParams.nRx*iParams.nTx/2+1:end,:) = pyz(iyP,izP) .* (Rt(2,:).*Rr).^(-1) .* exp(1j*k.*(Rt(2,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(2,:).*Rr).^2);
+                    s(1:iParams.nRx*iParams.nTx/2,:) = pyz(iyP,izP) .* (Rt(1,:).*Rr).^(-1) .* exp(1j*k.*(Rt(1,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(1,:)+Rr).^2);
+                    s(iParams.nRx*iParams.nTx/2+1:end,:) = pyz(iyP,izP) .* (Rt(2,:).*Rr).^(-1) .* exp(1j*k.*(Rt(2,:) + Rr) - 1j*pi*fParams.K/(c^2).*(Rt(2,:)+Rr).^2);
                     
                     idxStart = round((dely/(2*iParams.lambda_mm*1e-3) + (iParams.nVerMeasurement-1)/2)*iParams.nTx*iParams.nRx + 1);
                     idxEnd = round((dely/(2*iParams.lambda_mm*1e-3) + (iParams.nVerMeasurement-1)/2 + 1)*iParams.nTx*iParams.nRx);

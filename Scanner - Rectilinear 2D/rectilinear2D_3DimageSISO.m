@@ -15,7 +15,7 @@ addpath(genpath("../"))
 load fParamsAll; load iParamsAll; load pAll
 fParams = fParamsAll.v0;                      % Frequency Parameters
 iParams = iParamsAll.SISO_SAR;                % Scanning Parameters
-p = pAll.Grid3D;                              % Reflectivity Function p(x,y,z)
+p = pAll.CSAR_Grid3D;                              % Reflectivity Function p(x,y,z)
 clear fParamsAll iParamsAll pAll
 
 %% 3. Get the SISO Echo Signal syxkSISO = s(y,x,k)

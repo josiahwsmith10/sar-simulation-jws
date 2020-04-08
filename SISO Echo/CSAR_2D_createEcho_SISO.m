@@ -6,7 +6,7 @@
 %  Redistributions and use of source must retain the above copyright notice
 %  Redistributions in binary form must reproduce the above copyright notice
 
-function isarData = CSAR_2D_createEcho_SISO(iParams,fParams,p)
+function csarData = CSAR_2D_createEcho_SISO(iParams,fParams,p)
 
 %% Declare Optional Parameters
 %-------------------------------------------------------------------------%
@@ -17,7 +17,7 @@ end
 %% Maintain everything in the size of:
 % nAngMeasurement x adcSample x nVerMeasurement
 %-------------------------------------------------------------------------%
-isarData = complex(zeros(iParams.nAngMeasurement, fParams.adcSample, iParams.nVerMeasurement));
+csarData = complex(single(zeros(iParams.nAngMeasurement, fParams.adcSample, iParams.nVerMeasurement)));
 
 %% Declare Wavenumber Vector
 %-------------------------------------------------------------------------%
@@ -26,7 +26,7 @@ f = f0 + (0:fParams.adcSample-1)*fParams.K/fParams.fS; % wideband frequency
 
 c = 299792458; % physconst('lightspeed'); in m/s
 k = 2*pi*f/c;
-k = reshape(k,1,[]);
+k = single(reshape(k,1,[]));
 clear f f0
 
 %% Declare theta Synthetic Aperture Vector
@@ -42,18 +42,31 @@ if mod(iParams.nVerMeasurement,2) == 0
 else
     yM_m = yM_m - yM_m( (end+1)/2 );
 end
-yM_m = reshape(yM_m,1,1,[]);
+yM_m = single(reshape(yM_m,1,1,[]));
 
 %% Create Echo Signal
 %-------------------------------------------------------------------------%
-R0 = iParams.R0_mm*1e-3; % m
-pxyz = p.pxyz;
-parfor ixP = 1:p.xLim
-    for iyP = 1:p.yLim
-        for izP = 1:p.zLim
-            if pxyz(ixP,iyP,izP) > 1e-8
-                R = sqrt( (R0*cos(thetaM_rad) - p.xT(ixP)).^2 + (R0*sin(thetaM_rad) - p.zT(izP)).^2 + (yM_m - p.yT(iyP)).^2 );
-                isarData = isarData + pxyz(ixP,iyP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R);
+R0 = single(iParams.R0_mm*1e-3); % m
+pxyz = single(p.pxyz);
+if ~isempty(gcp('nocreate'))
+    parfor ixP = 1:p.xLim
+        for iyP = 1:p.yLim
+            for izP = 1:p.zLim
+                if pxyz(ixP,iyP,izP) > 1e-8
+                    R = sqrt( (R0*cos(thetaM_rad) - p.xT(ixP)).^2 + (R0*sin(thetaM_rad) - p.zT(izP)).^2 + (yM_m - p.yT(iyP)).^2 );
+                    csarData = csarData + pxyz(ixP,iyP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R - 1j*pi*fParams.K*(2*R/c).^2);
+                end
+            end
+        end
+    end
+else
+    for ixP = 1:p.xLim
+        for iyP = 1:p.yLim
+            for izP = 1:p.zLim
+                if pxyz(ixP,iyP,izP) > 1e-8
+                    R = sqrt( (R0*cos(thetaM_rad) - p.xT(ixP)).^2 + (R0*sin(thetaM_rad) - p.zT(izP)).^2 + (yM_m - p.yT(iyP)).^2 );
+                    csarData = csarData + pxyz(ixP,iyP,izP) .* (R.^(-2)) .* exp(1j*2*k.*R - 1j*pi*fParams.K*(2*R/c).^2);
+                end
             end
         end
     end
@@ -66,7 +79,7 @@ if iParams.showP
     for izP = 1:p.zLim
         if squeeze(mean(p.pxyz(:,:,izP),[1,2])) > 0
             figure
-            mesh(flip(squeeze(p.xT)),flip(squeeze(p.yT)),flipud(squeeze(p.pxyz(:,:,izP)).'))
+            mesh(flip(squeeze(p.xT)),flip(squeeze(p.yT)),flipud(squeeze(p.pxyz(:,:,izP)).'),'FaceColor','interp','LineStyle','none')
             title("Reflectivity Function")
             view(2)
             xlabel("x")
