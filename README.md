@@ -1,10 +1,10 @@
 # Synthetic Aperture Radar Simulations
 ## Simulation Scripts for SAR and CSAR Scenarios
-* Linear and Rectilinear SAR scanning patterns
-* Circular and Cylindrical SAR scanning patterns  
-* Efficient Near-field Imaging Algorithms on FMCW Radars
-* 3D Holographic Imaging Techniques Employed for High Resolution Imaging
-* Multistatic, MIMO Virtual Array Effects Investigated
+* Linear and rectilinear SAR scanning patterns
+* Circular and cylindrical SAR scanning patterns  
+* Efficient near-field imaging algorithms on FMCW Radars
+* 3D Holographic imaging techniques employed for high resolution imaging
+* Multistatic, MIMO virtual array effects investigated
 * TI mmWave EVM radars simulated, namely XWR1443
 
 ## Publications:
