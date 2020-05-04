@@ -13,9 +13,9 @@ addpath(genpath("../"))
 %% 2. Load iParams, fParams, and p
 %-------------------------------------------------------------------------%
 load fParamsAll; load iParamsAll; load pAll
-fParams = fParamsAll.v0;                      % Frequency Parameters
+fParams = fParamsAll.v3;                      % Frequency Parameters
 iParams = iParamsAll.MIMO_SAR;                % Scanning Parameters
-p = pAll.Grid3D;                              % Reflectivity Function p(x,y,z)
+p = pAll.PSF;                              % Reflectivity Function p(x,y,z)
 clear fParamsAll iParamsAll pAll
 
 %% 3. Get the MIMO Echo Signal sarData = s(y,k)

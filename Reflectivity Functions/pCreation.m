@@ -130,7 +130,8 @@ p.zT = linspace(2*p.zMax/p.zLim,2*p.zMax,p.zLim);
 p.pxz = zeros(p.xLim,p.yLim);
 p.pxz(round(end/2),round(end/2)) = 1;
 
-p.pxyz = cat(3, zeros( [size(p.pxz) (p.zLim)/2] ), p.pxz , zeros( [size(p.pxz) (p.zLim)/2 ]));
+p.pxyz = zeros(p.xLim,p.yLim,p.zLim);
+p.pxyz(end/2,end/2,end/2) = 1;
 
 pAll.PSF = p
 

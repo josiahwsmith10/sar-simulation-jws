@@ -41,6 +41,7 @@ end
 if ~isfield(iParams,"Stolt")
     iParams.Stolt = "linear";
 end
+tic
 
 %% Declare Wavenumber Vector
 %-------------------------------------------------------------------------%
@@ -91,7 +92,7 @@ kSy = 2*pi/(iParams.yStepM_mm*1e-3);
 kY = reshape(linspace(-kSy/2,kSy/2,size(sarData,1)),[],1);
 
 % Consider only visible spectrum of kZ
-kZU = reshape(linspace(0,2*max(k)*iParams.zU,size(sarData,2)),1,[]);
+kZU = reshape(linspace(0,2*max(k)*iParams.zU,iParams.nFFT),1,[]);
 kU = 1/2 * sqrt(kY.^2 + kZU.^2);
 
 %% Attempt Stolt Interpolation (kY,k) -> (kY,kZ)
@@ -112,9 +113,11 @@ end
 %-------------------------------------------------------------------------%
 sarImage = ifft2(sarImageFFT);
 
+disp("Completed 2D MIMO RMA in " + toc + "seconds")
+
 %% Display the Reconstructed Image
 %-------------------------------------------------------------------------%
-yRangeT_m = iParams.yStepM_mm * (-(iParams.nFFT-1)/2 : (iParams.nFFT-1)/2);
+yRangeT_m = iParams.yStepM_mm*1e-3 * (-(iParams.nFFT-1)/2 : (iParams.nFFT-1)/2);
 zRangeT_m = (1:iParams.nFFT)*iParams.lambda_mm/(4*iParams.nFFT);
 
 figure('OuterPosition',[350 150 670*2 712]);

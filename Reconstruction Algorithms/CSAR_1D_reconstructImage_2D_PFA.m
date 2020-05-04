@@ -58,6 +58,8 @@ if ~isfield(iParams,'af')
     iParams.af = 1;
 end
 
+tic
+
 %% Declare Wavenumber Vector
 %-------------------------------------------------------------------------%
 f0 = fParams.f0 + fParams.ADCStartTime*fParams.K; % This is for ADC sampling offset
@@ -154,6 +156,8 @@ if (iParams.xzSizeT_m ~= -1)
     csarImage = csarImage(indX,indZ);
 end
 
+disp("Completed 2D PFA in " + toc + " seconds")
+
 %% Display the Result
 %-------------------------------------------------------------------------%
 if iParams.displayResult
@@ -174,6 +178,7 @@ if iParams.displayResult
     xlabel("z (m)")
     ylabel("x (m)")
     zlabel("dB")
+    csarImageLog(csarImageLog < -100) = -100;
     xlim([zRangeT_m(1) zRangeT_m(end)])
     ylim([xRangeT_m(1) xRangeT_m(end)])
     zlim([-100 0])

@@ -29,7 +29,8 @@ clear f f0
 
 %% Declare theta Synthetic Aperture Vector
 %-------------------------------------------------------------------------%
-thetaM_rad = (0:iParams.tStepM_deg:((iParams.nAngMeasurement-1)*iParams.tStepM_deg))*pi/180;
+% thetaM_rad = (0:iParams.tStepM_deg:((iParams.nAngMeasurement-1)*iParams.tStepM_deg))*pi/180;
+thetaM_rad = ( (-iParams.nAngMeasurement/2):( (iParams.nAngMeasurement/2) - 1) )*iParams.tStepM_deg*pi/180;
 thetaM_rad = single(reshape(thetaM_rad,[],1));
 
 %% Get Array Dimensions

@@ -33,6 +33,11 @@ function sarImage = SAR_2D_reconstructImage_3D_BPA_MIMO(sarData,iParams,fParams,
 %   yT                  :   y-axis of target domain
 %   zT                  :   z-axis of target domain
 
+%% Declare Optional Paramters
+if ~isfield(iParams,'isAmplitudeFactor')
+    iParams.isAmplitudeFactor = true;
+end
+
 %% Declare Wavenumber Vectors
 %-------------------------------------------------------------------------%
 f0 = fParams.f0 + fParams.ADCStartTime*fParams.K; % This is for ADC sampling offset
@@ -55,8 +60,8 @@ xM = reshape(xM,1,[]);
 
 %% Declare Spatial y Vector
 %-------------------------------------------------------------------------%
-yM = (0:iParams.nVerMeasurement-1)*iParams.yStepM_mm*1e-3;
-if mod(iParams.nVerMeasurement,2) == 0
+yM = (0:iParams.nVerMeasurement*iParams.nTx*iParams.nRx-1)*iParams.yStepM_mm*1e-3;
+if mod(iParams.nVerMeasurement*iParams.nTx*iParams.nRx,2) == 0
     yM = yM - yM(end/2);
 else
     yM = yM - yM( (end+1)/2 );

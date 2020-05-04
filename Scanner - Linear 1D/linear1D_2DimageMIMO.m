@@ -13,7 +13,7 @@ addpath(genpath("../"))
 %% 2. Load iParams, fParams, and p
 %-------------------------------------------------------------------------%
 load fParamsAll; load iParamsAll; load pAll
-fParams = fParamsAll.v0;                      % Frequency Parameters
+fParams = fParamsAll.v3;                      % Frequency Parameters
 iParams = iParamsAll.MIMO_SAR;                % Scanning Parameters
 p = pAll.Grid3D;                              % Reflectivity Function p(x,y,z)
 clear fParamsAll iParamsAll pAll
@@ -28,6 +28,14 @@ sarDataY = SAR_1D_createEcho_MIMO(iParams,fParams,p);
 %-------------------------------------------------------------------------%
 sarDataYPC = phaseCorrection(sarDataY,iParams,fParams);
 
-%% 5. Reconstruct the 2D Image using Range Migration Algorithm (RMA)
+%% 5. Reconstruct the 2D Image using the Range Migration Algorithm (RMA)
 %-------------------------------------------------------------------------%
-sarImageX_2D_RMA = SAR_1D_reconstructImage_2D_RMA_MIMO(sarDataYPC,iParams,fParams);
+sarImageY_2D_RMA = SAR_1D_reconstructImage_2D_RMA_MIMO(sarDataYPC,iParams,fParams);
+
+%% 6. Reconstruct the 2D Image using the Back Projection Algorithm (BPA)
+
+sarImageY_2D_BPA = SAR_1D_reconstructImage_2D_BPA_MIMO(sarDataYPC,iParams,fParams,p);
+
+%% 7. Reconstruct the 2D Image using the Matched Filter (MF) Technique
+
+sarImageY_2D_MF = SAR_1D_reconstructImage_2D_MF_MIMO(sarDataYPC,iParams,fParams,p);

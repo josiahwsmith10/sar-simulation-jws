@@ -94,7 +94,7 @@ end
 %% Display the Reflectivity Function
 %-------------------------------------------------------------------------%
 figure;
-mesh(p.zT,p.yT*1e3,pyz);
+mesh(p.zT,p.yT,pyz,'FaceColor','interp','LineStyle','none');
 title("Reflectivity Function of Target Scene")
 xlabel("z (m)")
-ylabel("y (mm)")
+ylabel("y (m)")

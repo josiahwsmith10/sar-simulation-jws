@@ -46,14 +46,6 @@ else
     pxz = p.pxz;
 end
 
-if iParams.showP
-    figure;
-    mesh(p.zT,p.xT*1e3,pxz);
-    title("Reflectivity Function of Target Scene")
-    xlabel("z (m)")
-    ylabel("x (mm)")
-end
-
 %% Create Echo Signal
 %-------------------------------------------------------------------------%
 R0 = iParams.R0_mm*1e-3; % m
@@ -89,3 +81,15 @@ end
 %         isarData2(iT,iK) = sum( pxz .* (R.^(-2)) .* exp(1j*2*k(iK).*R), 'all');
 %     end
 % end
+
+%% Show Reflectivity Function
+%-------------------------------------------------------------------------%
+if iParams.showP
+    figure;
+    mesh(p.zT,p.xT,pxz,'FaceColor','interp','LineStyle','none');
+    title("Reflectivity Function of Target Scene")
+    xlabel("z (m)")
+    ylabel("x (m)")
+    xlim([p.zT(1) p.zT(end)])
+    ylim([p.xT(1) p.xT(end)])
+end

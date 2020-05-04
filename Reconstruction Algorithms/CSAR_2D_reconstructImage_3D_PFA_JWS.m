@@ -23,6 +23,7 @@ function [csarImage3D,xRangeT_m,yRangeT_m,zRangeT_m] =  CSAR_2D_reconstructImage
 %   xyzSizeT_m          :   Expected size of the target in the xz domain in m
 %   resize              :   Boolean if output image should be resized
 %   MIMO                :   Boolean if the input data is from a MIMO sensor
+%   displayResult       :   Boolean if the output image should be shown
 %   scanName            :   Name of the scan
 %   PFA                 :   Interpolation method for PFA
 %   nFFT                :   Number of FFT bins to use (before upsampling)
@@ -68,6 +69,11 @@ end
 if ~isfield(iParams,'resize')
     iParams.resize = true;
 end
+if ~isfield(iParams,'displayResult')
+    iParams.displayResult = false;
+end
+
+tic
 
 %% Declare Wavenumber Vector
 %-------------------------------------------------------------------------%
@@ -81,7 +87,8 @@ clear f f0 c
 
 %% Declare theta_rad Synthetic Aperture Vector
 %-------------------------------------------------------------------------%
-theta_rad = (0:iParams.tStepM_deg:((iParams.nAngMeasurement-1)*iParams.tStepM_deg))*pi/180;
+% theta_rad = (0:iParams.tStepM_deg:((iParams.nAngMeasurement-1)*iParams.tStepM_deg))*pi/180;
+theta_rad = ( (-iParams.nAngMeasurement/2):( (iParams.nAngMeasurement/2) - 1) )*iParams.tStepM_deg*pi/180;
 theta_rad = single(reshape(theta_rad,[],1));
 
 %% Declare y Synthetic Aperture Vector
@@ -184,12 +191,14 @@ clear theta_radUpsampleG kUpsampleG kYG azimuthFiltered theta_radUG kU kYG
 
 %% Recover CSAR Image: p(x,z,y)
 %-------------------------------------------------------------------------%
-csarImage3D = ifftshift(ifftshift(ifftn(csarImageFFT),1),2);
+csarImage3D = abs(ifftshift(ifftshift(ifftn(csarImageFFT),1),2));
 clear csarImageFFT
 
 %% Reorient CSAR Image: p(x,z,y) -> p(x,y,z)
 %-------------------------------------------------------------------------%
 csarImage3D = permute(csarImage3D,[1,3,2]);
+
+disp("Completed 3D PFA in " + toc + " seconds")
 
 %% Crop the Image for Related Region
 %-------------------------------------------------------------------------%
@@ -206,7 +215,7 @@ if (nargin == 4)
     yRangeT_m = yRangeT_m(indY);
     zRangeT_m = zRangeT_m(indZ);
     csarImage3D = csarImage3D(indX,indY,indZ);
-    clear indX indZ
+    clear indX indY indZ
 elseif (iParams.xyzSizeT_m ~= -1)
     indX = xRangeT_m>(-iParams.xyzSizeT_m/2 + mean(diff(xRangeT_m))) & xRangeT_m<(iParams.xyzSizeT_m/2);
     indY = yRangeT_m>(-iParams.xyzSizeT_m/2 + mean(diff(yRangeT_m))) & yRangeT_m<(iParams.xyzSizeT_m/2);
@@ -215,7 +224,7 @@ elseif (iParams.xyzSizeT_m ~= -1)
     yRangeT_m = yRangeT_m(indY);
     zRangeT_m = zRangeT_m(indZ);
     csarImage3D = csarImage3D(indX,indY,indZ);
-    clear indX indZ
+    clear indX indY indZ
 end
 if iParams.resize
     csarImageFull = csarImage3D;
@@ -225,6 +234,10 @@ if iParams.resize
     zRangeT_m = p.zT;
 end
 
+csarImage3D = permute(rot90(permute(csarImage3D,[3,1,2]),2),[2,3,1]);
+
 %% Display the Result
 %-------------------------------------------------------------------------%
-volumeViewer(abs(csarImage3D));
+if iParams.displayResult
+    volumeViewer(abs(csarImage3D));
+end

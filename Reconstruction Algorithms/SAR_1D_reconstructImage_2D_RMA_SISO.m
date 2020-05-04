@@ -114,7 +114,7 @@ sarImage = ifft2(sarImageFFT);
 
 %% Display the Reconstructed Image
 %-------------------------------------------------------------------------%
-xRangeT_m = iParams.xStepM_mm * (-(iParams.nFFT-1)/2 : (iParams.nFFT-1)/2);
+xRangeT_m = iParams.xStepM_mm*1e-3 * (-(iParams.nFFT-1)/2 : (iParams.nFFT-1)/2);
 zRangeT_m = (1:iParams.nFFT)*iParams.lambda_mm/(4*iParams.nFFT);
 
 figure('OuterPosition',[350 150 670*2 712]);

@@ -15,12 +15,15 @@ addpath(genpath("../"))
 load fParamsAll; load iParamsAll; load pAll
 fParams = fParamsAll.v3;                    % Frequency Parameters
 iParams = iParamsAll.MIMO_CSAR;             % Image and Scanning Parameters (360deg of rotation)
-p = pAll.CSAR_Grid3D;                       % Reflectivity p(x,y,z) parameters
+p = pAll.CSAR_PSF;                       % Reflectivity p(x,y,z) parameters
 clear fParamsAll iParamsAll pAll
 
 %% 3. Get the MIMO-CSAR Echo Signal s(theta,k,y): csarData
 %-------------------------------------------------------------------------%
-iParams.showP = false;
+iParams.showP = true;
+iParams.nVerMeasurement = 64;
+iParams.nAngMeasurement = 1000;
+iParams.tStepM_deg = 360/iParams.nAngMeasurement; % deg
 csarDataMIMO = CSAR_2D_createEcho_MIMO(iParams,fParams,p);
 
 %% 5. Perform Phase Correction
@@ -34,10 +37,11 @@ iParams.PFA = 'linear';
 iParams.xU = 2;
 iParams.yU = 1;
 iParams.zU = 2;
+iParams.resize = true;
 [csarImage3D_PFA,x,y,z] = CSAR_2D_reconstructImage_3D_PFA_JWS(csarDataMIMO_PC,iParams,fParams,p);
 
 %% 6. PSF at each dimension
 %-------------------------------------------------------------------------%
-figure; subplot(131); mesh(z,x,abs(squeeze(csarImage3D_PFA(:,(end)/2,:))));
-subplot(132);mesh(x,y,abs(squeeze(csarImage3D_PFA((end)/2,:,:))));
-subplot(133);mesh(y,z,abs(squeeze(csarImage3D_PFA(:,:,(end)/2))));
+figure; subplot(131); mesh(z,x,abs(squeeze(csarImage3D_PFA(:,(end)/2,:))),'FaceColor','interp','LineStyle','none');
+subplot(132);mesh(x,y,abs(squeeze(csarImage3D_PFA((end)/2,:,:))),'FaceColor','interp','LineStyle','none');
+subplot(133);mesh(y,z,abs(squeeze(csarImage3D_PFA(:,:,(end)/2))),'FaceColor','interp','LineStyle','none');

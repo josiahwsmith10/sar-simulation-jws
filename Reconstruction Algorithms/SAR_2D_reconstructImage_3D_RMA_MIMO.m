@@ -6,7 +6,7 @@
 %  Redistributions and use of source must retain the above copyright notice
 %  Redistributions in binary form must reproduce the above copyright notice
 
-function sarImage = SAR_2D_reconstructImage_3D_RMA_MIMO(sarData,iParams,fParams)
+function [sarImage3D,xRangeT_m,yRangeT_m,zRangeT_m] = SAR_2D_reconstructImage_3D_RMA_MIMO(sarData,iParams,fParams,p)
 % Reconstructs a 3D image from SAR echo data using the range migration
 % algorithm (RMA). Expects a 2D rectilinear scan across the x-axis with a
 % MIMO transceiver and the y-axis with a MIMO transceiver
@@ -22,6 +22,9 @@ function sarImage = SAR_2D_reconstructImage_3D_RMA_MIMO(sarData,iParams,fParams)
 %   yStepM_mm           :   Step size of y-axis in mm
 %   scanName            :   Name of the scan
 %   Stolt               :   Interpolation method for RMA
+%   xyzSizeT_m          :   Expected size of the target in the xz domain in m
+%   resize              :   Boolean if output image should be resized
+%   displayResult       :   Boolean if the output image should be shown
 %
 % fParams: struct with fields
 %   K                   :   Chrip Slope (Hz/s)
@@ -29,6 +32,14 @@ function sarImage = SAR_2D_reconstructImage_3D_RMA_MIMO(sarData,iParams,fParams)
 %   adcSample           :   Number of samples
 %   ADCStartTime        :   Time it takes to start sampling (s)
 %   f0                  :   Chirp start frequency (Hz)
+%
+% p: struct with fields
+%   xT                  :   x-axis of target domain
+%   yT                  :   y-axis of target domain
+%   zT                  :   z-axis of target domain
+%   xLim                :   Size of x-axis of target domain
+%   yLim                :   Size of y-axis of target domain
+%   zLim                :   Size of z-axis of target domain
 
 %% Declare Optional Parameters
 %-------------------------------------------------------------------------%
@@ -38,9 +49,17 @@ end
 if ~isfield(iParams,"mex")
     iParams.mex = true;
 end
-if 2*fParams.adcSample > iParams.nFFT
-    iParams.nFFT = 2*fParams.adcSample;
+if ~isfield(iParams,'xyzSizeT_m') && nargin < 4
+    iParams.xyzSizeT_m = 0.4;
 end
+if ~isfield(iParams,'resize')
+    iParams.resize = true;
+end
+if ~isfield(iParams,'displayResult')
+    iParams.displayResult = false;
+end
+
+tic
 
 %% Zeropad sarData
 %-------------------------------------------------------------------------%
@@ -85,21 +104,63 @@ clear c f f0 kSx kX kSy kY kZU
 %% Attempt Stolt Interpolation S(kY,kX,k) -> S(kY,kX,kZ)
 %-------------------------------------------------------------------------%
 disp("Attempting 3D Stolt interpolation using " + iParams.Stolt + " method")
-tic
 if iParams.mex
     sarImageFFT = stoltInterp3D_mex(sarDataFFT,k,KU);
 else
     sarImageFFT = stoltInterp3D(sarDataFFT,k,KU);
 end
-disp("Stolt interpolation completed in " + toc + " seconds")
 % Works with: linear,nearest,next,previous,v5cubic
 sarImageFFT(isnan(sarImageFFT)) = 0;
 clear sarData KU k fParams sizeKU2
 
 %% Recover the Reflectivity Function
 %-------------------------------------------------------------------------%
-sarImage = ifftn(sarImageFFT,[iParams.nFFT,iParams.nFFT,iParams.nFFT]);
+sarImage3D = single(abs(ifftn(sarImageFFT,[iParams.nFFT,iParams.nFFT,iParams.nFFT])));
+
+%% Correct Dimensions of Reconstruced Data (y,x,z) -> (x,y,z)
+%-------------------------------------------------------------------------%
+
+sarImage3D = permute(sarImage3D,[2,1,3]);
+
+disp("Completed 3D RMA in " + toc + " seconds")
+
+%% Crop the Image for Related Region
+%-------------------------------------------------------------------------%
+xRangeT_m = iParams.xStepM_mm*1e-3 * (-(iParams.nFFT-1)/2 : (iParams.nFFT-1)/2);
+yRangeT_m = iParams.yStepM_mm*1e-3 * (-(iParams.nFFT-1)/2 : (iParams.nFFT-1)/2);
+zRangeT_m = (1:iParams.nFFT)*iParams.lambda_mm/(2*iParams.nFFT);
+
+if (nargin == 4)
+    indX = xRangeT_m >= (p.xT(1)) & xRangeT_m <= (p.xT(end));
+    indY = yRangeT_m >= (p.yT(1)) & yRangeT_m <= (p.yT(end));
+    indZ = zRangeT_m >= (p.zT(1)) & zRangeT_m <= (p.zT(end));
+    xRangeT_m = xRangeT_m(indX);
+    yRangeT_m = yRangeT_m(indY);
+    zRangeT_m = zRangeT_m(indZ);
+    sarImage3D = sarImage3D(indX,indY,indZ);
+    clear indX indY indZ
+elseif (iParams.xyzSizeT_m ~= -1)
+    indX = xRangeT_m>(-iParams.xyzSizeT_m/2 + mean(diff(xRangeT_m))) & xRangeT_m<(iParams.xyzSizeT_m/2);
+    indY = yRangeT_m>(-iParams.xyzSizeT_m/2 + mean(diff(yRangeT_m))) & yRangeT_m<(iParams.xyzSizeT_m/2);
+    indZ = zRangeT_m>(-iParams.xyzSizeT_m/2 + mean(diff(zRangeT_m))) & zRangeT_m<(iParams.xyzSizeT_m/2);
+    xRangeT_m = xRangeT_m(indX);
+    yRangeT_m = yRangeT_m(indY);
+    zRangeT_m = zRangeT_m(indZ);
+    sarImage3D = sarImage3D(indX,indY,indZ);
+    clear indX indY indZ
+end
+if iParams.resize
+%     csarImageFull = sarImage3D;
+    sarImage3D = imresize3(abs(sarImage3D),[p.xLim,p.yLim,p.zLim]);
+    xRangeT_m = p.xT;
+    yRangeT_m = p.yT;
+    zRangeT_m = p.zT;
+end
+
+sarImage3D = permute(rot90(permute(sarImage3D,[3,1,2]),2),[2,3,1]);
 
 %% Display the Result
 %-------------------------------------------------------------------------%
-volumeViewer(abs(sarImage));
+if iParams.displayResult
+    volumeViewer(abs(sarImage3D));
+end

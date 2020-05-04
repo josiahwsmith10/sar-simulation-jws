@@ -22,15 +22,23 @@ clear fParamsAll iParamsAll pAll
 %-------------------------------------------------------------------------%
 sarData_MIMO = SAR_2D_createEcho_MIMO(iParams,fParams,p);
 
+%% 3a. Perform Phase Correction
+
+sarData_MIMOPC = phaseCorrection(sarData_MIMO,iParams,fParams);
+
 %% 4. Reconstruct the 3D Image by Range Migration Algorithm (RMA)
 %-------------------------------------------------------------------------%
 iParams.mex = false;
-sarImage_RMA = SAR_2D_reconstructImage_3D_RMA_MIMO(sarData_MIMO,iParams,fParams);
+tic
+sarImage_RMA = SAR_2D_reconstructImage_3D_RMA_MIMO(sarData_MIMOPC,iParams,fParams);
+toc
 
 %% 5. Reconstruct the 3D Image by Back Projection Algorithm (BPA)
 %-------------------------------------------------------------------------%
-sarImage_BPA = SAR_2D_reconstructImage_3D_BPA_MIMO(sarData_MIMO,iParams,fParams,p);
+tic
+sarImage_BPA = SAR_2D_reconstructImage_3D_BPA_MIMO(sarData_MIMOPC,iParams,fParams,p);
+toc
 
 %% 6. Reconstruct the 3D Image by Matched Filter FFT (MF) Technique
 %-------------------------------------------------------------------------%
-sarImage_MF = SAR_2D_reconstructImage_3D_MF_MIMO(sarData_MIMO,iParams,fParams,p);
+sarImage_MF = SAR_2D_reconstructImage_3D_MF_MIMO(sarData_MIMOPC,iParams,fParams,p);

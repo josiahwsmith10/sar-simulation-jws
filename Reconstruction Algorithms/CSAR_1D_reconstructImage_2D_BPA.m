@@ -34,6 +34,8 @@ if ~isfield(iParams,'AmplitudeFactor')
     iParams.AmplitudeFactor = true;
 end
 
+tic
+
 %% Declare Wavenumber Vector
 %-------------------------------------------------------------------------%
 f0 = fParams.f0 + fParams.ADCStartTime*fParams.K; % This is for ADC sampling offset
@@ -90,26 +92,28 @@ else
     end
 end
 
+disp("Completed 2D Circular BPA in " + toc + " seconds")
+
 %% Display the Result
 %-------------------------------------------------------------------------%
 figure('OuterPosition',[350 150 670*2 712]);
 subplot(121)
-mesh(zRangeT_m,xRangeT_m*1e3,abs(csarImage),'FaceColor','interp','LineStyle','none')
+mesh(zRangeT_m,xRangeT_m,abs(csarImage),'FaceColor','interp','LineStyle','none')
 view(2)
 xlim([zRangeT_m(1) zRangeT_m(end)])
-ylim([xRangeT_m(1)*1e3 xRangeT_m(end)*1e3])
+ylim([xRangeT_m(1) xRangeT_m(end)])
 xlabel("z (m)")
-ylabel("x (mm)")
+ylabel("x (m)")
 title(iParams.scanName + " ISAR 2D Image using BPA")
 
 logpxz = mag2db(abs(csarImage));
 logpxz = logpxz - max(logpxz(:));
 subplot(122)
-mesh(zRangeT_m,xRangeT_m*1e3,logpxz,'FaceColor','interp','LineStyle','none')
+mesh(zRangeT_m,xRangeT_m,logpxz,'FaceColor','interp','LineStyle','none')
 xlabel("z (m)")
 ylabel("x (mm)")
 zlabel("dB")
 xlim([zRangeT_m(1) zRangeT_m(end)])
-ylim([xRangeT_m(1)*1e3 xRangeT_m(end)*1e3])
+ylim([xRangeT_m(1) xRangeT_m(end)])
 zlim([-100 0])
 title(iParams.scanName + " ISAR 2D Log Image using BPA")

@@ -20,10 +20,7 @@ clear fParamsAll iParamsAll pAll
 
 %% 3. Get the SISO-CSAR Echo Signal s(theta,k,y): csarData
 %-------------------------------------------------------------------------%
-% p.pxyz(end/2,end/2,end/2) = 1;
-% p.pxyz(end/4,end/2,end/4) = 1;
-% p.pxyz(end/4,end/4,end/4) = 1;
-iParams.nAngMeasurement = 1024;
+iParams.nAngMeasurement = 512;
 iParams.tStepM_deg = 360/iParams.nAngMeasurement; % deg
 
 iParams.showP = true;
