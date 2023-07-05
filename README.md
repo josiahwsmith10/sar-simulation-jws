@@ -82,13 +82,4 @@ If you appreciate our work, please cite one of the papers using this toolbox
 	volume       = 9,
 	pages        = {10893--10902}
 }
-@article{,
-   author = {Smith, J. W. and Torlak, M.},
-   title = {Terhertz Imaging Toolbox with Interactive User Interface},
-   journal = {},
-   volume = {},
-   number = {},
-   pages = {},
-   year = {2023},
-}
 ```
