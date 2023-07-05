@@ -20,7 +20,7 @@ If you appreciate our work, please cite one of the papers using this toolbox
 - Improved Static Hand Gesture Classification on Deep Convolutional Neural Networks using Novel Sterile Training Technique ([arXiv](https://arxiv.org/abs/2305.02039), [DOI](https://doi.org/10.1109/ACCESS.2021.3051454))
 - Near-Field MIMO-ISAR Millimeter-Wave Imaging ([arXiv](https://arxiv.org/abs/2305.02030), [DOI](https://doi.org/10.1109/RadarConf2043947.2020.9266412))
 ```
-@article{smith2023dual_radar,
+@article{smith2023deep,
 	title        = {Deep Learning-Based Multiband Signal Fusion for 3-D SAR Super-Resolution},
 	author       = {Smith, J. W. and Torlak, M.},
 	year         = 2023,
@@ -64,7 +64,7 @@ If you appreciate our work, please cite one of the papers using this toolbox
 	volume       = 24,
 	pages        = {2315--2328}
 }
-@inproceedings{smith2020nearfieldisar,
+@inproceedings{smith2020near,
 	title        = {Near-Field {MIMO-ISAR} Millimeter-Wave Imaging},
 	author       = {Smith, J. W. and Yanik, M. E. and Torlak, M.},
 	year         = 2020,
